@@ -78,12 +78,55 @@ class SocialMediaAnalyzer:
         # Preprocess text
         post_text = post_text.lower()
         
-        # Count concern keywords
+        # Count concern keywords with word boundary checks
         concern_scores = {concern: 0 for concern in self.concern_keywords}
         
         for concern, keywords in self.concern_keywords.items():
             for keyword in keywords:
-                if keyword in post_text:
+                # Use word boundary checks to avoid partial matches
+                # For example, "sad" should not match "saddle"
+                pattern = r'\b' + re.escape(keyword) + r'\b'
+                matches = re.findall(pattern, post_text)
+                
+                # Add weight based on the number of occurrences
+                if matches:
+                    # Give more weight to exact matches of critical keywords
+                    if concern in ['suicidal', 'self_harm'] and keyword in ['suicide', 'kill myself', 'end my life', 'cut', 'harm', 'hurt myself']:
+                        concern_scores[concern] += len(matches) * 1.5
+                    else:
+                        concern_scores[concern] += len(matches)
+        
+        # Check for phrases that indicate severity
+        severity_phrases = [
+            "can't take it anymore", "no reason to live", "better off dead", 
+            "want to die", "don't want to live", "hate myself",
+            "always anxious", "constant worry", "panic attack",
+            "completely hopeless", "extremely depressed", "severely depressed"
+        ]
+        
+        for phrase in severity_phrases:
+            if phrase in post_text:
+                # Identify which concern this phrase relates to
+                if phrase in ["can't take it anymore", "no reason to live", "better off dead", "want to die", "don't want to live"]:
+                    concern_scores['suicidal'] += 2
+                elif phrase in ["hate myself"]:
+                    concern_scores['depression'] += 1.5
+                elif phrase in ["always anxious", "constant worry", "panic attack"]:
+                    concern_scores['anxiety'] += 1.5
+                elif phrase in ["completely hopeless", "extremely depressed", "severely depressed"]:
+                    concern_scores['depression'] += 2
+        
+        # Check for context indicators
+        context_indicators = {
+            'depression': ["for weeks", "for months", "every day", "all the time", "can't feel", "no joy"],
+            'anxiety': ["constantly", "all the time", "can't stop", "overwhelming", "terrified"],
+            'insomnia': ["can't sleep", "awake all night", "haven't slept", "no sleep"],
+            'substance_abuse': ["need it", "can't stop", "withdrawal", "addicted", "dependency"]
+        }
+        
+        for concern, indicators in context_indicators.items():
+            for indicator in indicators:
+                if indicator in post_text:
                     concern_scores[concern] += 1
         
         # Normalize scores
@@ -91,6 +134,8 @@ class SocialMediaAnalyzer:
         if max_score > 0:
             for concern in concern_scores:
                 concern_scores[concern] /= max_score
+                # Cap at 1.0
+                concern_scores[concern] = min(concern_scores[concern], 1.0)
         
         return concern_scores
     
@@ -104,17 +149,44 @@ class SocialMediaAnalyzer:
         Returns:
             str: Risk level (Low, Moderate, High)
         """
-        # Calculate average score
-        avg_score = sum(concern_scores.values()) / len(concern_scores) if concern_scores else 0
-        
-        # Check for suicidal or self-harm concerns
+        # Check for suicidal or self-harm concerns first (highest priority)
         suicidal_score = concern_scores.get('suicidal', 0)
         self_harm_score = concern_scores.get('self_harm', 0)
         
-        # Determine risk level
-        if suicidal_score > 0.5 or self_harm_score > 0.5:
+        # Immediate high risk if suicidal or self-harm scores are significant
+        if suicidal_score > 0.4 or self_harm_score > 0.4:
             return "High"
-        elif avg_score > 0.3:
+        
+        # Check for substance abuse as a secondary concern
+        substance_score = concern_scores.get('substance_abuse', 0)
+        
+        # Check for depression and anxiety scores
+        depression_score = concern_scores.get('depression', 0)
+        anxiety_score = concern_scores.get('anxiety', 0)
+        
+        # Calculate weighted average score with more weight on critical concerns
+        weighted_scores = [
+            suicidal_score * 3,  # Highest weight
+            self_harm_score * 2.5,
+            substance_score * 1.5,
+            depression_score * 1.2,
+            anxiety_score * 1.2
+        ]
+        
+        weights = [3, 2.5, 1.5, 1.2, 1.2]
+        valid_weights = sum(weights) if any(weighted_scores) else 1
+        weighted_avg = sum(weighted_scores) / valid_weights
+        
+        # Calculate regular average as a backup
+        avg_score = sum(concern_scores.values()) / len(concern_scores) if concern_scores else 0
+        
+        # Use the higher of the two averages
+        final_score = max(weighted_avg, avg_score)
+        
+        # Determine risk level based on final score
+        if final_score > 0.5:
+            return "High"
+        elif final_score > 0.2:
             return "Moderate"
         else:
             return "Low"
