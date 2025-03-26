@@ -1,0 +1,37 @@
+# NLP Documentation for Social Media Analysis
+
+## NLP Overview
+Natural Language Processing (NLP) is a field of artificial intelligence that focuses on the interaction between computers and humans through natural language. In this project, NLP is utilized to analyze social media posts for mental health concerns, allowing for the identification of issues such as depression, anxiety, and suicidal thoughts. This analysis is crucial for providing timely support and interventions for individuals expressing mental health struggles online.
+
+## Model Descriptions
+The project employs two primary models for NLP tasks:
+
+1. **OpenAI's GPT-3.5 Turbo Model**: 
+   - A state-of-the-art language model that uses deep learning techniques to understand and generate human-like text.
+   - It processes input text by analyzing its context and semantics, enabling it to provide insightful responses based on the content of social media posts.
+   - **How the Model Works**:
+     1. **Input Processing**: The model tokenizes the input text into smaller units for analysis.
+     2. **Contextual Understanding**: It uses attention mechanisms to understand the relationships between words and phrases in the text.
+     3. **Response Generation**: Based on the analysis, the model generates a response that reflects the identified mental health concerns.
+
+2. **BERT (Bidirectional Encoder Representations from Transformers)**:
+   - Utilized for certain NLP tasks, particularly in the assessment component.
+   - BERT is designed to understand the context of words in a sentence by looking at the words that come before and after them, making it highly effective for tasks that require a deep understanding of language.
+   - **How BERT Works**:
+     1. **Bidirectional Context**: Unlike traditional models that read text sequentially, BERT reads the entire sequence of words at once, allowing it to understand the context better.
+     2. **Fine-tuning**: BERT can be fine-tuned on specific datasets, such as mental health-related texts, to improve its performance in identifying relevant concerns.
+
+## TSV File Usage
+The project utilizes two TSV files:
+- **Full_Train_Data.tsv**: This file contains training data used to teach the model about various mental health concerns. It includes user IDs, post content, and labels indicating the presence of specific concerns. This data is essential for training the models to recognize patterns and indicators of mental health issues.
+- **Full_Test_Data.tsv**: This file is used for testing the model's performance. It contains similar data but is not used during the training phase, allowing for an unbiased evaluation of the model's capabilities. The testing phase is critical for validating the model's accuracy and effectiveness in real-world scenarios.
+
+These TSV files play a crucial role in the NLP process, providing the necessary data for training and validating the model's effectiveness in analyzing social media posts for mental health issues.
+
+## NLP Usage in the Application
+NLP is utilized across various components of the application, including:
+- **Social Media Analysis**: Analyzing posts for mental health concerns using both OpenAI and BERT models, allowing for a comprehensive understanding of user sentiments and issues.
+- **Assessment Component**: Utilizing BERT for deeper analysis of user inputs to provide accurate assessments of mental health status, ensuring that users receive appropriate recommendations and support based on their expressed concerns.
+- **Chatbot Module**: Engaging users in conversation, utilizing NLP to understand and respond to queries effectively, thereby enhancing user interaction and support.
+
+This comprehensive approach to NLP ensures that the application can effectively address mental health concerns and provide valuable insights to users.

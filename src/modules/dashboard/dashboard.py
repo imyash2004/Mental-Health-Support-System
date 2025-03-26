@@ -110,7 +110,13 @@ class DashboardModule:
                     if risk_level == "Low":
                         st.markdown(
                             """
-                            <div style='background-color: #d4edda; padding: 10px; border-radius: 5px;'>
+                            <div style='background-color: #d4edda;
+        padding: 15px;
+        border-radius: 8px;
+        font-weight: bold;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+        font-size: 18px;'>
                             <strong>Low Risk:</strong> Your responses suggest you're currently experiencing good mental health. 
                             Continue your self-care practices and monitor your well-being.
                             </div>
@@ -120,7 +126,13 @@ class DashboardModule:
                     elif risk_level == "Moderate":
                         st.markdown(
                             """
-                            <div style='background-color: #fff3cd; padding: 10px; border-radius: 5px;'>
+                            <div style='background-color: #d4edda;
+        padding: 15px;
+        border-radius: 8px;
+        font-weight: bold;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+        font-size: 18px;'>
                             <strong>Moderate Risk:</strong> Your responses indicate some challenges with your mental health. 
                             Consider implementing the recommendations below and reaching out for support if needed.
                             </div>
@@ -130,7 +142,13 @@ class DashboardModule:
                     elif risk_level == "High":
                         st.markdown(
                             """
-                            <div style='background-color: #f8d7da; padding: 10px; border-radius: 5px;'>
+                            <div style='background-color: #d4edda;
+        padding: 15px;
+        border-radius: 8px;
+        font-weight: bold;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+        font-size: 18px;'>
                             <strong>High Risk:</strong> Your responses suggest significant challenges with your mental health. 
                             We strongly recommend consulting with a mental health professional for support.
                             </div>
@@ -146,7 +164,7 @@ class DashboardModule:
                 for recommendation in recommendations:
                     st.markdown(
                         f"""
-                        <div style='background-color: #e2e3e5; padding: 10px; border-radius: 5px; margin-bottom: 10px;'>
+                        <div style='background-color: #e2e3e5; padding: 10px; border-radius: 5px; margin-bottom: 10px; font-size: 18px; color: #155724; border: 1px solid #c3e6cb;'>
                         <strong>{recommendation['category']}:</strong> {recommendation['text']}
                         </div>
                         """, 

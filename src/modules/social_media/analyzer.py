@@ -1,6 +1,10 @@
 import os
 import csv
 import re
+import json
+import openai
+
+# Set OpenAI API key - using the same key as in the chatbot module
 
 class SocialMediaAnalyzer:
     """
@@ -12,13 +16,69 @@ class SocialMediaAnalyzer:
         """Initialize the Social Media Analyzer."""
         # Define concern keywords for simple detection
         self.concern_keywords = {
-            'depression': ['depressed', 'depression', 'sad', 'hopeless', 'worthless', 'empty', 'numb'],
-            'anxiety': ['anxious', 'anxiety', 'worried', 'nervous', 'panic', 'fear', 'stress'],
-            'suicidal': ['suicide', 'kill myself', 'end my life', 'die', 'death', 'no reason to live'],
-            'self_harm': ['cut', 'harm', 'hurt myself', 'pain', 'injury', 'blood', 'scars'],
-            'insomnia': ['sleep', 'insomnia', 'awake', 'tired', 'exhausted', 'rest', 'fatigue'],
-            'substance_abuse': ['alcohol', 'drugs', 'substance', 'addiction', 'dependent', 'withdrawal']
-        }
+    'depression': [
+        'depressed', 'depression', 'sad', 'hopeless', 'worthless', 'empty', 'numb',
+        'lonely', 'down', 'melancholy', 'miserable', 'despair', 'grief', 'tearful',
+        'low mood', 'drained', 'exhausted', 'losing interest', 'apathetic', 'dead inside',
+        'void', 'crying', 'can’t feel anything', 'hollow', 'isolated', 'lifeless',
+        'nothing matters', 'no energy', 'dull', 'tired of everything', 'burned out',
+        'dark thoughts', 'no motivation', 'can’t get out of bed', 'lost hope', 'wishing I wasn’t here',
+        'feeling blue', 'emotionally drained', 'done with life', 'empty inside', 'lifeless'
+    ],
+    'anxiety': [
+        'anxious', 'anxiety', 'worried', 'nervous', 'panic', 'fear', 'stress',
+        'overthinking', 'restless', 'uneasy', 'tension', 'dread', 'overwhelmed',
+        'heart racing', 'shaky', 'sweaty palms', 'butterflies in stomach',
+        'can’t breathe', 'racing thoughts', 'paranoid', 'jittery', 'on edge',
+        'panic attack', 'nauseous from stress', 'headache from anxiety', 'tight chest',
+        'impending doom', 'mind won’t stop', 'stomach in knots', 'hyperventilating',
+        'can’t focus', 'always worrying', 'constant fear', 'dizzy from panic',
+        'fearful', 'spiraling thoughts', 'afraid of everything', 'too much pressure'
+    ],
+    'suicidal': [
+        'suicide', 'kill myself', 'end my life', 'die', 'death', 'no reason to live',
+        'give up', 'hopeless', 'not worth it', 'better off dead', 'goodbye forever',
+        'nothing matters', 'self-destruction', 'want to disappear', 'final goodbye',
+        'life is pointless', 'can’t take it anymore', 'tired of being alive',
+        'wouldn’t mind dying', 'life is too painful', 'ready to go', 'no escape',
+        'never wake up', 'want it all to end', 'losing the will to live',
+        'thinking about ending it', 'feeling like a burden', 'nobody would care',
+        'I don’t belong here', 'want to vanish', 'just want peace', 'exit plan',
+        'wish I wasn’t here', 'darkest thoughts', 'last resort', 'giving up on life'
+    ],
+    'self_harm': [
+        'cut', 'harm', 'hurt myself', 'pain', 'injury', 'blood', 'scars',
+        'burn myself', 'bruise', 'self-inflicted', 'scratch', 'wound', 'hidden scars',
+        'numb the pain', 'punish myself', 'release the pain', 'bleeding',
+        'marks on my skin', 'pain is the only thing I feel', 'relief through pain',
+        'carving into skin', 'hidden wounds', 'self-inflicted wounds', 'need to feel something',
+        'hurting makes it better', 'deserve the pain', 'feels like I need it',
+        'body is a canvas of pain', 'I like seeing the blood', 'pain addiction'
+    ],
+    'insomnia': [
+        'sleep', 'insomnia', 'awake', 'tired', 'exhausted', 'rest', 'fatigue',
+        'can’t sleep', 'no sleep', 'sleepless', 'restless nights', 'tossing and turning',
+        'waking up at night', 'nightmares', 'disturbed sleep', 'early waking',
+        'brain won’t shut off', 'stuck in my thoughts', 'midnight thoughts',
+        'sleep deprived', 'hours without sleep', 'exhaustion hitting hard',
+        'eyes heavy but can’t sleep', 'clock watching', 'counting sheep doesn’t work',
+        'sleep is impossible', 'wish I could sleep', 'mind racing at night',
+        'no rest for the weary', 'day and night are the same', 'bedtime struggle',
+        'permanently tired', 'zombie mode', 'can’t function without sleep'
+    ],
+    'substance_abuse': [
+        'alcohol', 'drugs', 'substance', 'addiction', 'dependent', 'withdrawal',
+        'drunk', 'high', 'overdose', 'rehab', 'relapse', 'binge drinking',
+        'substance craving', 'can’t stop', 'drug abuse', 'blackout', 'hangover',
+        'opioids', 'stimulants', 'cocaine', 'heroin', 'meth', 'pills', 'painkillers',
+        'need a drink', 'can’t get through the day without it', 'getting wasted',
+        'substance use problem', 'drowning my sorrows', 'popping pills',
+        'chasing a high', 'need a fix', 'withdrawal symptoms', 'can’t function sober',
+        'losing control', 'drugs are my escape', 'addicted to the feeling',
+        'hooked on it', 'can’t quit', 'always looking for my next hit'
+    ]
+}
+
         
         # Load sample data
         self.train_data = self._load_sample_data('Full_Train_Data.tsv', 5)
@@ -62,9 +122,103 @@ class SocialMediaAnalyzer:
         
         return data
     
-    def analyze_post(self, post_text):
+    def analyze_post_with_openai(self, post_text):
         """
-        Analyze a social media post for mental health concerns.
+        Analyze a social media post for mental health concerns using OpenAI.
+        
+        Args:
+            post_text (str): Text of the post
+            
+        Returns:
+            dict: Dictionary of concerns and their confidence scores
+        """
+        if not post_text or not isinstance(post_text, str):
+            return {}
+        
+        try:
+            # Create a system message that provides context about the analysis task
+            system_message = """
+            You are an AI mental health analyzer. Your task is to analyze the provided text for signs of mental health concerns.
+            Specifically, evaluate the text for the following concerns:
+            
+            1. Depression
+            2. Anxiety
+            3. Suicidal thoughts
+            4. Self-harm
+            5. Insomnia
+            6. Substance abuse
+            
+            For each concern, provide a score between 0 and 1, where:
+            - 0 means no indication of this concern
+            - 0.3 means mild indication
+            - 0.6 means moderate indication
+            - 0.9-1.0 means strong indication
+            
+            Pay special attention to suicidal thoughts and self-harm, as these are critical concerns.
+            
+            Return your analysis in the following JSON format:
+            {
+                "depression": score (0-1),
+                "anxiety": score (0-1),
+                "suicidal": score (0-1),
+                "self_harm": score (0-1),
+                "insomnia": score (0-1),
+                "substance_abuse": score (0-1),
+                "explanation": "Brief explanation of your analysis"
+            }
+            
+            Only return the JSON object, nothing else.
+            """
+            
+            # Create the conversation with the system message and user message
+            response = openai.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": system_message},
+                    {"role": "user", "content": f"Analyze this text for mental health concerns: \"{post_text}\""}
+                ],
+                max_tokens=500,
+                temperature=0.3,  # Lower temperature for more consistent results
+                response_format={"type": "json_object"}  # Request JSON response
+            )
+            
+            # Extract the response text
+            result_text = response.choices[0].message.content.strip()
+            
+            # Parse the JSON response
+            try:
+                result = json.loads(result_text)
+                
+                # Ensure all required keys are present
+                concern_scores = {
+                    'depression': float(result.get('depression', 0)),
+                    'anxiety': float(result.get('anxiety', 0)),
+                    'suicidal': float(result.get('suicidal', 0)),
+                    'self_harm': float(result.get('self_harm', 0)),
+                    'insomnia': float(result.get('insomnia', 0)),
+                    'substance_abuse': float(result.get('substance_abuse', 0))
+                }
+                
+                # Store explanation if available
+                if 'explanation' in result:
+                    concern_scores['explanation'] = result['explanation']
+                
+                return concern_scores
+                
+            except json.JSONDecodeError:
+                print(f"Error parsing OpenAI response: {result_text}")
+                # Fall back to keyword-based analysis
+                return self.analyze_post_with_keywords(post_text)
+                
+        except Exception as e:
+            print(f"Error using OpenAI for analysis: {e}")
+            # Fall back to keyword-based analysis
+            return self.analyze_post_with_keywords(post_text)
+    
+    def analyze_post_with_keywords(self, post_text):
+        """
+        Analyze a social media post for mental health concerns using keyword matching.
+        This is a fallback method when OpenAI analysis fails.
         
         Args:
             post_text (str): Text of the post
@@ -76,15 +230,41 @@ class SocialMediaAnalyzer:
             return {}
         
         # Preprocess text
-        post_text = post_text.lower()
+        post_text = post_text.lower().strip()
         
-        # Count concern keywords with word boundary checks
+        # Direct detection of critical phrases - these should immediately trigger high scores
+        critical_phrases = {
+            'suicidal': [
+                'suicidal thoughts', 'thinking about suicide', 'want to kill myself', 
+                'planning to end my life', 'considering suicide', 'suicidal ideation',
+                'suicidal', 'kill myself', 'end my life', 'end it all', 'take my own life',
+                'don\'t want to live anymore', 'want to die', 'ready to die',
+                'thinking of ending it', 'no reason to live', 'life is not worth living'
+            ],
+            'self_harm': [
+                'cutting myself', 'hurting myself', 'self harm', 'self-harm', 
+                'harming myself', 'injuring myself', 'burning myself',
+                'want to hurt myself', 'thinking about hurting myself'
+            ]
+        }
+        
+        # Initialize concern scores
         concern_scores = {concern: 0 for concern in self.concern_keywords}
         
+        # Check for direct critical phrases first
+        for concern, phrases in critical_phrases.items():
+            for phrase in phrases:
+                if phrase in post_text:
+                    # Direct matches to critical phrases get a very high score
+                    concern_scores[concern] = 0.9  # Almost maximum score
+                    # If it's suicidal thoughts, this is extremely serious
+                    if concern == 'suicidal' and ('suicidal thoughts' in post_text or 'thinking about suicide' in post_text):
+                        concern_scores[concern] = 1.0  # Maximum score
+        
+        # Count concern keywords with word boundary checks
         for concern, keywords in self.concern_keywords.items():
             for keyword in keywords:
                 # Use word boundary checks to avoid partial matches
-                # For example, "sad" should not match "saddle"
                 pattern = r'\b' + re.escape(keyword) + r'\b'
                 matches = re.findall(pattern, post_text)
                 
@@ -92,7 +272,7 @@ class SocialMediaAnalyzer:
                 if matches:
                     # Give more weight to exact matches of critical keywords
                     if concern in ['suicidal', 'self_harm'] and keyword in ['suicide', 'kill myself', 'end my life', 'cut', 'harm', 'hurt myself']:
-                        concern_scores[concern] += len(matches) * 1.5
+                        concern_scores[concern] += len(matches) * 2.0  # Increased weight
                     else:
                         concern_scores[concern] += len(matches)
         
@@ -101,43 +281,69 @@ class SocialMediaAnalyzer:
             "can't take it anymore", "no reason to live", "better off dead", 
             "want to die", "don't want to live", "hate myself",
             "always anxious", "constant worry", "panic attack",
-            "completely hopeless", "extremely depressed", "severely depressed"
+            "completely hopeless", "extremely depressed", "severely depressed",
+            "life is pointless", "no hope", "giving up", "lost all hope",
+            "can't go on", "too much to bear", "unbearable pain"
         ]
         
         for phrase in severity_phrases:
             if phrase in post_text:
                 # Identify which concern this phrase relates to
-                if phrase in ["can't take it anymore", "no reason to live", "better off dead", "want to die", "don't want to live"]:
-                    concern_scores['suicidal'] += 2
+                if phrase in ["can't take it anymore", "no reason to live", "better off dead", "want to die", "don't want to live", "life is pointless", "no hope", "giving up", "lost all hope", "can't go on"]:
+                    concern_scores['suicidal'] += 2.5  # Increased weight
                 elif phrase in ["hate myself"]:
-                    concern_scores['depression'] += 1.5
+                    concern_scores['depression'] += 2.0
                 elif phrase in ["always anxious", "constant worry", "panic attack"]:
-                    concern_scores['anxiety'] += 1.5
-                elif phrase in ["completely hopeless", "extremely depressed", "severely depressed"]:
-                    concern_scores['depression'] += 2
+                    concern_scores['anxiety'] += 2.0
+                elif phrase in ["completely hopeless", "extremely depressed", "severely depressed", "too much to bear", "unbearable pain"]:
+                    concern_scores['depression'] += 2.5
         
         # Check for context indicators
         context_indicators = {
-            'depression': ["for weeks", "for months", "every day", "all the time", "can't feel", "no joy"],
-            'anxiety': ["constantly", "all the time", "can't stop", "overwhelming", "terrified"],
-            'insomnia': ["can't sleep", "awake all night", "haven't slept", "no sleep"],
-            'substance_abuse': ["need it", "can't stop", "withdrawal", "addicted", "dependency"]
+            'depression': ["for weeks", "for months", "every day", "all the time", "can't feel", "no joy", "feeling empty", "nothing matters"],
+            'anxiety': ["constantly", "all the time", "can't stop", "overwhelming", "terrified", "panic", "dread"],
+            'insomnia': ["can't sleep", "awake all night", "haven't slept", "no sleep", "insomnia"],
+            'substance_abuse': ["need it", "can't stop", "withdrawal", "addicted", "dependency", "relying on"]
         }
         
         for concern, indicators in context_indicators.items():
             for indicator in indicators:
                 if indicator in post_text:
-                    concern_scores[concern] += 1
+                    concern_scores[concern] += 1.5  # Increased weight
         
-        # Normalize scores
+        # Special case for direct mention of suicidal thoughts
+        if "suicidal thought" in post_text or "suicidal ideation" in post_text:
+            concern_scores['suicidal'] = 1.0  # Maximum score
+        
+        # Normalize scores but ensure critical concerns maintain high values
         max_score = max(concern_scores.values()) if concern_scores.values() else 0
         if max_score > 0:
             for concern in concern_scores:
-                concern_scores[concern] /= max_score
+                # For suicidal and self-harm, keep scores high
+                if concern in ['suicidal', 'self_harm'] and concern_scores[concern] > 0.4:
+                    # Keep it high, minimum 0.7
+                    concern_scores[concern] = max(concern_scores[concern] / max_score, 0.7)
+                else:
+                    concern_scores[concern] /= max_score
+                
                 # Cap at 1.0
                 concern_scores[concern] = min(concern_scores[concern], 1.0)
         
         return concern_scores
+    
+    def analyze_post(self, post_text):
+        """
+        Analyze a social media post for mental health concerns.
+        Tries to use OpenAI first, falls back to keyword-based analysis if that fails.
+        
+        Args:
+            post_text (str): Text of the post
+            
+        Returns:
+            dict: Dictionary of concerns and their confidence scores
+        """
+        # Try OpenAI analysis first
+        return self.analyze_post_with_openai(post_text)
     
     def get_risk_level(self, concern_scores):
         """
@@ -149,12 +355,13 @@ class SocialMediaAnalyzer:
         Returns:
             str: Risk level (Low, Moderate, High)
         """
-        # Check for suicidal or self-harm concerns first (highest priority)
+        # Direct check for suicidal or self-harm mentions - these are always high risk
         suicidal_score = concern_scores.get('suicidal', 0)
         self_harm_score = concern_scores.get('self_harm', 0)
         
-        # Immediate high risk if suicidal or self-harm scores are significant
-        if suicidal_score > 0.4 or self_harm_score > 0.4:
+        # Any significant mention of suicide or self-harm is high risk
+        # Lowered threshold to catch more potential cases
+        if suicidal_score > 0.2 or self_harm_score > 0.3:
             return "High"
         
         # Check for substance abuse as a secondary concern
@@ -166,14 +373,14 @@ class SocialMediaAnalyzer:
         
         # Calculate weighted average score with more weight on critical concerns
         weighted_scores = [
-            suicidal_score * 3,  # Highest weight
-            self_harm_score * 2.5,
-            substance_score * 1.5,
-            depression_score * 1.2,
-            anxiety_score * 1.2
+            suicidal_score * 5,  # Increased weight
+            self_harm_score * 4,  # Increased weight
+            substance_score * 2,
+            depression_score * 1.5,
+            anxiety_score * 1.5
         ]
         
-        weights = [3, 2.5, 1.5, 1.2, 1.2]
+        weights = [5, 4, 2, 1.5, 1.5]  # Updated weights
         valid_weights = sum(weights) if any(weighted_scores) else 1
         weighted_avg = sum(weighted_scores) / valid_weights
         
@@ -183,10 +390,10 @@ class SocialMediaAnalyzer:
         # Use the higher of the two averages
         final_score = max(weighted_avg, avg_score)
         
-        # Determine risk level based on final score
-        if final_score > 0.5:
+        # Adjusted thresholds to be more sensitive
+        if final_score > 0.35:  # Lowered from 0.5
             return "High"
-        elif final_score > 0.2:
+        elif final_score > 0.15:  # Lowered from 0.2
             return "Moderate"
         else:
             return "Low"

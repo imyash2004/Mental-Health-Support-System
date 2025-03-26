@@ -9,7 +9,6 @@ import warnings
 import openai
 
 # Set OpenAI API key
-openai.api_key = "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"
 
 # Check if we're in simple mode
 SIMPLE_MODE = os.environ.get('SIMPLE_MODE', 'false').lower() == 'true'
@@ -358,7 +357,7 @@ class ChatbotModule:
     
     def generate_response(self, message):
         """
-        Generate a response based on the user message.
+        Generate a response based on the user message using OpenAI.
         
         Args:
             message (str): User message
@@ -366,24 +365,81 @@ class ChatbotModule:
         Returns:
             tuple: (response, sentiment_score)
         """
-        # Check for emergency keywords
+        # Check for emergency keywords first for immediate response
         for keyword in self.emergency_keywords:
             if keyword in message.lower():
-                # Use fallback response for emergency situations
-                return self.generate_fallback_response(message, "emergency"), 0.0
+                # For emergency situations, use a specialized OpenAI prompt
+                try:
+                    # Create a specialized system message for emergency situations
+                    emergency_system_message = """
+                    You are a mental health support chatbot responding to a potential crisis situation. 
+                    Your primary concern is the user's safety. Provide a compassionate, supportive response that:
+                    
+                    1. Acknowledges the severity of their situation
+                    2. Encourages them to seek immediate professional help
+                    3. Provides specific crisis resources (National Suicide Prevention Lifeline: 1-800-273-8255, Crisis Text Line: Text HOME to 741741)
+                    4. Offers immediate coping strategies if appropriate
+                    
+                    Keep your response concise (3-4 sentences) but ensure it conveys the importance of getting professional help immediately.
+                    """
+                    
+                    # Create the conversation with the emergency system message and user message
+                    response = openai.chat.completions.create(
+                        model="gpt-3.5-turbo",
+                        messages=[
+                            {"role": "system", "content": emergency_system_message},
+                            {"role": "user", "content": message}
+                        ],
+                        max_tokens=150,
+                        temperature=0.5  # Lower temperature for more consistent crisis responses
+                    )
+                    
+                    # Extract the response text
+                    emergency_response = response.choices[0].message.content.strip()
+                    return emergency_response, 0.0  # Return 0.0 as sentiment score for emergency situations
+                except Exception as e:
+                    # If OpenAI fails for emergency, use the fallback emergency response
+                    warnings.warn(f"Error generating emergency response with OpenAI: {e}. Using fallback emergency response.")
+                    return self.generate_fallback_response(message, "emergency"), 0.0
         
-        # Try to generate a response using OpenAI
+        # For non-emergency messages, use the standard psychologist prompt
         try:
             response = self.generate_openai_response(message)
             sentiment_score = self.analyze_sentiment(message)
             return response, sentiment_score
         except Exception as e:
-            warnings.warn(f"Error generating response with OpenAI: {e}. Using fallback response generation.")
-            # Use fallback response generation
-            intent = self.detect_intent(message)
-            sentiment_score = self.analyze_sentiment(message)
-            response = self.generate_fallback_response(message, intent)
-            return response, sentiment_score
+            warnings.warn(f"Error generating response with OpenAI: {e}. Retrying with simplified prompt.")
+            
+            # Try again with a simplified prompt as a backup
+            try:
+                # Simplified system message as backup
+                simplified_system_message = """
+                You are a supportive mental health chatbot. Provide a helpful, empathetic response to the user's message.
+                Keep your response concise (2-3 sentences).
+                """
+                
+                # Create the conversation with the simplified system message
+                response = openai.chat.completions.create(
+                    model="gpt-3.5-turbo",
+                    messages=[
+                        {"role": "system", "content": simplified_system_message},
+                        {"role": "user", "content": message}
+                    ],
+                    max_tokens=100,
+                    temperature=0.7
+                )
+                
+                # Extract the response text
+                simplified_response = response.choices[0].message.content.strip()
+                sentiment_score = self.analyze_sentiment(message)
+                return simplified_response, sentiment_score
+            except Exception as e2:
+                warnings.warn(f"Error with simplified OpenAI prompt: {e2}. Using fallback response generation.")
+                # Only use fallback as a last resort
+                intent = self.detect_intent(message)
+                sentiment_score = self.analyze_sentiment(message)
+                response = self.generate_fallback_response(message, intent)
+                return response, sentiment_score
     
     def render(self):
         """Render the chatbot interface."""
