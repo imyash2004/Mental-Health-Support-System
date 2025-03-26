@@ -1,0 +1,79 @@
+# Project Intelligence: AI-Powered Mental Health Support System
+
+## Project Patterns
+
+### Code Organization
+- Use modular architecture with clear separation of concerns
+- Organize code by feature/module rather than by technical function
+- Keep UI components separate from business logic
+- Maintain consistent file naming conventions across the project
+
+### Development Workflow
+- Implement core modules first before extending to advanced features
+- Use incremental development with regular testing
+- Document code and design decisions as they are made
+- Prioritize user privacy and data security in all implementations
+
+### User Experience
+- Focus on creating a safe, non-judgmental interface
+- Ensure all interactions are empathetic and supportive
+- Provide clear guidance and feedback to users
+- Make emergency resources easily accessible at all times
+
+## Technical Preferences
+
+### Python Coding Style
+- Follow PEP 8 guidelines for Python code
+- Use type hints for function parameters and return values
+- Prefer explicit over implicit code
+- Document functions and classes with docstrings
+
+### Streamlit Implementation
+- Use Streamlit's session state for maintaining user context
+- Organize UI into logical sections with clear headers
+- Implement custom CSS for consistent styling
+- Use callbacks for interactive components
+
+### NLP Model Usage
+- Prefer pre-trained models with fine-tuning for specific tasks
+- Implement model caching to improve performance
+- Use model quantization for deployment when possible
+- Document model limitations and potential biases
+
+## Project Intelligence
+
+### Critical Implementation Paths
+- User authentication and session management
+- Secure storage of sensitive user data
+- NLP model integration and performance optimization
+- Crisis detection and emergency response protocols
+
+### Known Challenges
+- Balancing AI capabilities with ethical considerations
+- Ensuring privacy while providing personalized support
+- Managing resource-intensive NLP operations
+- Integrating with external APIs with rate limits
+
+### Evolution of Project Decisions
+- Starting with core modules before expanding to more complex features
+- Beginning with local deployment before moving to cloud
+- Using SQLite for initial development before potential migration to Firebase
+- Implementing basic NLP features before adding more sophisticated analysis
+
+## Tool Usage Patterns
+
+### Development Tools
+- VSCode as the primary IDE
+- Git for version control
+- Virtual environment for dependency management
+- pytest for testing
+
+### Deployment Tools
+- Docker for containerization (potential)
+- GitHub Actions for CI/CD (potential)
+- Cloud platform (AWS/Azure/Heroku) for hosting
+
+### Monitoring Tools
+- Logging framework for error tracking
+- Performance monitoring for NLP models
+- User feedback collection for continuous improvement

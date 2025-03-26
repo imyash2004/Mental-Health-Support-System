@@ -1,0 +1,11 @@
+Python version: 3.6.15 (default, Nov 11 2024, 01:06:05) 
+[GCC Apple LLVM 16.0.0 (clang-1600.0.26.3)]
+Current working directory: /Users/vaibhavagarwal/Desktop/yash/sem6/nlp/project
+Streamlit is NOT installed
+Pandas is NOT installed
+NLTK is NOT installed
+Transformers is NOT installed
+PyTorch is NOT installed
+run.py exists
+src/app.py exists
+data directory does NOT exist
