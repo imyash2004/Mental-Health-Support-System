@@ -1,0 +1,257 @@
+# AI-POWERED MENTAL HEALTH SUPPORT SYSTEM - SYSTEM OVERVIEW
+
+## SYSTEM ARCHITECTURE
+
+The system follows a modular architecture with the following key components:
+
+1. Core Application (app.py)
+   - Manages navigation and module integration
+   - Handles user session state
+   - Provides consistent UI styling
+
+2. Database Module (database.py)
+   - SQLite database for data persistence
+   - Stores user information, assessment results, chat history
+   - Provides methods for data retrieval and storage
+
+3. Self-Assessment Module (assessment.py)
+   - Questionnaires for mental health evaluation
+   - NLP-based analysis of text responses
+   - Score calculation and risk level determination
+   - Personalized recommendations
+
+4. Chatbot Module (chatbot.py)
+   - OpenAI API integration for natural responses
+   - Intent recognition and sentiment analysis
+   - Emergency situation detection
+   - Multi-tier fallback mechanisms
+
+5. Social Media Analysis Module (social_media.py)
+   - Multi-platform content analysis (Twitter, Facebook, Instagram, Reddit)
+   - Mental health concern detection
+   - Risk level assessment
+   - Personalized recommendations
+
+6. Dashboard Module (dashboard.py)
+   - Visualization of assessment results
+   - Activity tracking
+   - Progress monitoring
+   - Resource recommendations
+
+7. Utilities Module (nlp_utils.py)
+   - Shared NLP functionality
+   - Fallback mechanisms for when deep learning is unavailable
+   - Text analysis utilities
+
+## TECHNOLOGIES APPLIED
+
+### 1. Frontend Framework
+- Streamlit: Used for creating the interactive web interface
+- Custom CSS: Applied for consistent styling and dark theme
+
+### 2. Natural Language Processing
+- Primary: Transformers library with pre-trained models
+  - Used for sentiment analysis in self-assessment and chatbot
+  - Provides advanced text understanding capabilities
+- Secondary: Rule-based fallbacks
+  - Keyword matching for intent recognition
+  - Pattern-based sentiment analysis
+  - Used when deep learning frameworks are unavailable
+
+### 3. AI Integration
+- OpenAI GPT-3.5 Turbo API
+  - Used in chatbot for natural, empathetic responses
+  - System prompt designed for mental health support
+  - Fallback to rule-based responses if API unavailable
+
+### 4. Data Visualization
+- Plotly: Interactive charts for assessment results and social media analysis
+- Custom-styled components for risk levels and recommendations
+
+### 5. Data Storage
+- SQLite: Lightweight database for storing user data
+- JSON: Used for structured data exchange between modules
+
+## IMPLEMENTATION DETAILS
+
+### Self-Assessment Module
+- Multiple assessment types (general, anxiety, depression)
+- Combines multiple-choice responses with text analysis
+- Uses sentiment analysis to evaluate free-text responses
+- Calculates risk scores and generates personalized recommendations
+- Visualization of results with gauge charts and color-coded risk levels
+
+### Chatbot Module
+- Three-tier response generation:
+  1. OpenAI API (primary): Natural, context-aware responses
+  2. Transformers (secondary): Local model-based responses
+  3. Rule-based (tertiary): Pattern-matching fallback
+- Emergency keyword detection for crisis situations
+- Sentiment analysis to adapt responses to user's emotional state
+- Session-based conversation history
+
+### Social Media Analysis Module
+- Platform-specific content analysis
+- Keyword-based concern detection for:
+  - Depression
+  - Anxiety
+  - Suicidal ideation
+  - Self-harm
+  - Substance abuse
+  - Insomnia
+- Risk level determination based on concern scores
+- Visualization of concern scores with bar charts
+- Personalized recommendations based on detected concerns
+
+### Dashboard Module
+- Assessment history tracking
+- Visualization of mental health trends over time
+- Activity summary with usage statistics
+- Resource recommendations based on assessment results
+
+## VISUAL DESIGN SYSTEM
+
+### Color Scheme
+- Background: Dark theme (#1e1e2e)
+- Primary: Blue gradient (#6a98f0 to #8a4fff)
+- Accent: Bright blue (#38b6ff)
+- Info: Cyan (#5ce1ff)
+- Success: Green (#4cd97b)
+- Warning: Yellow (#ffcc5c)
+- Danger: Red (#ff5c5c)
+
+### UI Components
+- Risk Level Indicators:
+  - Low Risk: Green text on semi-transparent green background
+  - Moderate Risk: Yellow text on semi-transparent yellow background
+  - High Risk: Red text on semi-transparent red background
+  
+- Recommendation Boxes:
+  - Dark background with left border accent
+  - Colored category headings
+  - White text for content
+  
+- Charts and Visualizations:
+  - Dark backgrounds
+  - High-contrast colors for data
+  - Consistent typography
+
+## FALLBACK MECHANISMS
+
+The system implements graceful degradation when certain dependencies are unavailable:
+
+1. Deep Learning Frameworks:
+   - Checks for PyTorch, TensorFlow, or Flax
+   - Falls back to rule-based approaches if none available
+   
+2. Transformers Library:
+   - Used for advanced NLP if available
+   - Falls back to rule-based NLP if unavailable
+   
+3. OpenAI API:
+   - Primary response generation for chatbot
+   - Falls back to local models or rule-based responses if unavailable
+
+## RUNNING MODES
+
+1. Standard Mode:
+   ```
+   python run.py
+   ```
+   
+2. Simple Mode (without deep learning dependencies):
+   ```
+   python run.py --simple
+   ```
+   
+3. Debug Mode:
+   ```
+   python run_with_debug.py
+   ```
+
+## DETAILED NLP IMPLEMENTATION
+
+### NLP Components and Applications
+
+1. **Sentiment Analysis**
+   - **Where Used**: 
+     - Self-assessment module for analyzing free-text responses
+     - Chatbot module for understanding user emotional state
+     - Social media analysis module for evaluating content
+   - **How Implemented**:
+     - Primary: Transformer-based models (DistilBERT) for accurate sentiment classification
+     - Fallback: Rule-based lexicon approach using positive/negative word lists
+     - Output: Sentiment scores (0-1 scale) where 0 is negative and 1 is positive
+
+2. **Intent Recognition**
+   - **Where Used**:
+     - Chatbot module to understand user queries and provide relevant responses
+   - **How Implemented**:
+     - Pattern matching against predefined intents (greeting, goodbye, feeling_bad, etc.)
+     - Keyword extraction to identify specific topics
+     - Emergency keyword detection for crisis situations
+
+3. **Text Classification**
+   - **Where Used**:
+     - Social media analyzer to detect mental health concerns
+   - **How Implemented**:
+     - Keyword-based classification for different concern categories
+     - Frequency analysis to determine concern intensity
+     - Score normalization to create comparable metrics
+
+4. **Natural Language Generation**
+   - **Where Used**:
+     - Chatbot module for generating responses
+   - **How Implemented**:
+     - Primary: OpenAI GPT-3.5 Turbo API with specialized mental health prompt
+     - Secondary: Template-based responses with personalization
+     - Tertiary: Rule-based response selection from predefined options
+
+### NLP Processing Pipeline
+
+1. **Text Preprocessing**
+   - Lowercasing for consistent matching
+   - Basic tokenization for keyword extraction
+   - Pattern matching for specific phrases
+
+2. **Analysis**
+   - Sentiment scoring (positive/negative/neutral)
+   - Intent classification
+   - Concern detection and scoring
+
+3. **Response Generation**
+   - Context-aware responses via OpenAI API
+   - Sentiment-adapted responses (adjusting tone based on user sentiment)
+   - Emergency response prioritization
+
+### NLP Models and Resources
+
+1. **Pre-trained Models**
+   - DistilBERT for sentiment analysis
+   - GPT-3.5 Turbo for response generation
+
+2. **Custom Resources**
+   - Domain-specific keyword lists for mental health concerns
+   - Intent patterns for conversation understanding
+   - Emergency keyword detection system
+
+### Adaptation and Fallbacks
+
+The system implements a tiered approach to NLP:
+
+1. **Full Capability** (when all dependencies available)
+   - Transformer-based sentiment analysis
+   - OpenAI API for natural language generation
+   - Advanced text understanding
+
+2. **Reduced Capability** (when some dependencies unavailable)
+   - Local transformer models without deep learning frameworks
+   - Template-based response generation
+   - Basic pattern matching
+
+3. **Minimal Capability** (when most dependencies unavailable)
+   - Rule-based sentiment analysis
+   - Keyword matching for intent recognition
+   - Predefined response selection
+
+This tiered approach ensures the system remains functional across different environments while providing the best possible experience based on available resources.

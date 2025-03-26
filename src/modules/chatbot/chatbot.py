@@ -9,6 +9,7 @@ import warnings
 import openai
 
 # Set OpenAI API key
+openai.api_key = "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"
 
 # Check if we're in simple mode
 SIMPLE_MODE = os.environ.get('SIMPLE_MODE', 'false').lower() == 'true'

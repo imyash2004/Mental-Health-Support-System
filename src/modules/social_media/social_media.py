@@ -167,16 +167,19 @@ class SocialMediaModule:
                         st.markdown("<div class='sub-header'>Analysis Results</div>", unsafe_allow_html=True)
                         
                         # Display risk level with appropriate color
-                        risk_color = "var(--success-color)"  # Green for low risk
+                        risk_color = "#4cd97b"  # Bright green for low risk
+                        risk_bg_color = "rgba(76, 217, 123, 0.15)"
                         if risk_level == "Moderate":
-                            risk_color = "var(--warning-color)"  # Yellow for moderate risk
+                            risk_color = "#ffcc5c"  # Bright yellow for moderate risk
+                            risk_bg_color = "rgba(255, 204, 92, 0.15)"
                         elif risk_level == "High":
-                            risk_color = "var(--danger-color)"  # Red for high risk
+                            risk_color = "#ff5c5c"  # Bright red for high risk
+                            risk_bg_color = "rgba(255, 92, 92, 0.15)"
                         
                         st.markdown(
                             f"""
-                            <div class='info-box' style='border-left: 4px solid {risk_color};'>
-                            <strong>Risk Level:</strong> {risk_level}
+                            <div style='background-color: {risk_bg_color}; border-left: 4px solid {risk_color}; padding: 10px; border-radius: 5px; margin-bottom: 10px;'>
+                            <strong style='color: {risk_color};'>Risk Level:</strong> <span style='color: white;'>{risk_level}</span>
                             </div>
                             """, 
                             unsafe_allow_html=True
@@ -228,8 +231,8 @@ class SocialMediaModule:
                         for recommendation in recommendations:
                             st.markdown(
                                 f"""
-                                <div class='info-box'>
-                                <strong>{recommendation['category']}:</strong> {recommendation['text']}
+                                <div style='background-color: rgba(58, 58, 78, 0.8); border-left: 4px solid #5ce1ff; padding: 10px; border-radius: 5px; margin-bottom: 10px;'>
+                                <strong style='color: #5ce1ff;'>{recommendation['category']}:</strong> <span style='color: white;'>{recommendation['text']}</span>
                                 </div>
                                 """, 
                                 unsafe_allow_html=True
@@ -284,16 +287,19 @@ class SocialMediaModule:
                                 top_concerns = [concern for concern, score in top_concerns if score > 0]
                                 
                                 # Display risk level with appropriate color
-                                risk_color = "var(--success-color)"  # Green for low risk
+                                risk_color = "#4cd97b"  # Bright green for low risk
+                                risk_bg_color = "rgba(76, 217, 123, 0.15)"
                                 if risk_level == "Moderate":
-                                    risk_color = "var(--warning-color)"  # Yellow for moderate risk
+                                    risk_color = "#ffcc5c"  # Bright yellow for moderate risk
+                                    risk_bg_color = "rgba(255, 204, 92, 0.15)"
                                 elif risk_level == "High":
-                                    risk_color = "var(--danger-color)"  # Red for high risk
+                                    risk_color = "#ff5c5c"  # Bright red for high risk
+                                    risk_bg_color = "rgba(255, 92, 92, 0.15)"
                                 
                                 st.markdown(
                                     f"""
-                                    <div class='info-box' style='border-left: 4px solid {risk_color};'>
-                                    <strong>Risk Level:</strong> {risk_level}
+                                    <div style='background-color: {risk_bg_color}; border-left: 4px solid {risk_color}; padding: 10px; border-radius: 5px; margin-bottom: 10px;'>
+                                    <strong style='color: {risk_color};'>Risk Level:</strong> <span style='color: white;'>{risk_level}</span>
                                     </div>
                                     """, 
                                     unsafe_allow_html=True
@@ -306,8 +312,8 @@ class SocialMediaModule:
                                 for recommendation in recommendations:
                                     st.markdown(
                                         f"""
-                                        <div class='info-box'>
-                                        <strong>{recommendation['category']}:</strong> {recommendation['text']}
+                                        <div style='background-color: rgba(58, 58, 78, 0.8); border-left: 4px solid #5ce1ff; padding: 10px; border-radius: 5px; margin-bottom: 10px;'>
+                                        <strong style='color: #5ce1ff;'>{recommendation['category']}:</strong> <span style='color: white;'>{recommendation['text']}</span>
                                         </div>
                                         """, 
                                         unsafe_allow_html=True
@@ -343,16 +349,19 @@ class SocialMediaModule:
                             top_concerns = [concern for concern, score in top_concerns if score > 0]
                             
                             # Display risk level with appropriate color
-                            risk_color = "var(--success-color)"  # Green for low risk
+                            risk_color = "#4cd97b"  # Bright green for low risk
+                            risk_bg_color = "rgba(76, 217, 123, 0.15)"
                             if risk_level == "Moderate":
-                                risk_color = "var(--warning-color)"  # Yellow for moderate risk
+                                risk_color = "#ffcc5c"  # Bright yellow for moderate risk
+                                risk_bg_color = "rgba(255, 204, 92, 0.15)"
                             elif risk_level == "High":
-                                risk_color = "var(--danger-color)"  # Red for high risk
+                                risk_color = "#ff5c5c"  # Bright red for high risk
+                                risk_bg_color = "rgba(255, 92, 92, 0.15)"
                             
                             st.markdown(
                                 f"""
-                                <div class='info-box' style='border-left: 4px solid {risk_color};'>
-                                <strong>Risk Level:</strong> {risk_level}
+                                <div style='background-color: {risk_bg_color}; border-left: 4px solid {risk_color}; padding: 10px; border-radius: 5px; margin-bottom: 10px;'>
+                                <strong style='color: {risk_color};'>Risk Level:</strong> <span style='color: white;'>{risk_level}</span>
                                 </div>
                                 """, 
                                 unsafe_allow_html=True
@@ -365,8 +374,8 @@ class SocialMediaModule:
                             for recommendation in recommendations:
                                 st.markdown(
                                     f"""
-                                    <div class='info-box'>
-                                    <strong>{recommendation['category']}:</strong> {recommendation['text']}
+                                    <div style='background-color: rgba(58, 58, 78, 0.8); border-left: 4px solid #5ce1ff; padding: 10px; border-radius: 5px; margin-bottom: 10px;'>
+                                    <strong style='color: #5ce1ff;'>{recommendation['category']}:</strong> <span style='color: white;'>{recommendation['text']}</span>
                                     </div>
                                     """, 
                                     unsafe_allow_html=True

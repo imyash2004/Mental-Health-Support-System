@@ -697,9 +697,9 @@ class SelfAssessmentModule:
                 if results['risk_level'] == "Low":
                     st.markdown(
                         """
-                        <div style='background-color: #d4edda; padding: 10px; border-radius: 5px;'>
-                        <strong>Low Risk:</strong> Your responses suggest you're currently experiencing good mental health. 
-                        Continue your self-care practices and monitor your well-being.
+                        <div style='background-color: rgba(76, 217, 123, 0.15); border-left: 4px solid #4cd97b; padding: 10px; border-radius: 5px; margin-bottom: 10px;'>
+                        <strong style='color: #4cd97b;'>Low Risk:</strong> <span style='color: white;'>Your responses suggest you're currently experiencing good mental health. 
+                        Continue your self-care practices and monitor your well-being.</span>
                         </div>
                         """, 
                         unsafe_allow_html=True
@@ -707,9 +707,9 @@ class SelfAssessmentModule:
                 elif results['risk_level'] == "Moderate":
                     st.markdown(
                         """
-                        <div style='background-color: #fff3cd; padding: 10px; border-radius: 5px;'>
-                        <strong>Moderate Risk:</strong> Your responses indicate some challenges with your mental health. 
-                        Consider implementing the recommendations below and reaching out for support if needed.
+                        <div style='background-color: rgba(255, 204, 92, 0.15); border-left: 4px solid #ffcc5c; padding: 10px; border-radius: 5px; margin-bottom: 10px;'>
+                        <strong style='color: #ffcc5c;'>Moderate Risk:</strong> <span style='color: white;'>Your responses indicate some challenges with your mental health. 
+                        Consider implementing the recommendations below and reaching out for support if needed.</span>
                         </div>
                         """, 
                         unsafe_allow_html=True
@@ -717,9 +717,9 @@ class SelfAssessmentModule:
                 elif results['risk_level'] == "High":
                     st.markdown(
                         """
-                        <div style='background-color: #f8d7da; padding: 10px; border-radius: 5px;'>
-                        <strong>High Risk:</strong> Your responses suggest significant challenges with your mental health. 
-                        We strongly recommend consulting with a mental health professional for support.
+                        <div style='background-color: rgba(255, 92, 92, 0.15); border-left: 4px solid #ff5c5c; padding: 10px; border-radius: 5px; margin-bottom: 10px;'>
+                        <strong style='color: #ff5c5c;'>High Risk:</strong> <span style='color: white;'>Your responses suggest significant challenges with your mental health. 
+                        We strongly recommend consulting with a mental health professional for support.</span>
                         </div>
                         """, 
                         unsafe_allow_html=True
@@ -731,8 +731,8 @@ class SelfAssessmentModule:
             for recommendation in results['recommendations']:
                 st.markdown(
                     f"""
-                    <div style='background-color: #e2e3e5; padding: 10px; border-radius: 5px; margin-bottom: 10px;'>
-                    <strong>{recommendation['category']}:</strong> {recommendation['text']}
+                    <div style='background-color: rgba(58, 58, 78, 0.8); border-left: 4px solid #5ce1ff; padding: 10px; border-radius: 5px; margin-bottom: 10px;'>
+                    <strong style='color: #5ce1ff;'>{recommendation['category']}:</strong> <span style='color: white;'>{recommendation['text']}</span>
                     </div>
                     """, 
                     unsafe_allow_html=True
