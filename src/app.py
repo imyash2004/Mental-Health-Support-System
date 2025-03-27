@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 from modules.self_assessment.assessment import SelfAssessmentModule
 from modules.chatbot.chatbot import ChatbotModule
+from modules.resource.resource import ResourceModule
 from modules.dashboard.dashboard import DashboardModule
 from modules.social_media.social_media import SocialMediaModule
 from modules.database.database import Database
@@ -265,6 +266,13 @@ except Exception as e:
     st.warning(f"Social Media Module initialization failed: {e}")
     social_media_module = None
 
+try:
+    from modules.resource.resource import ResourceModule
+    resource_module = ResourceModule(db)  # Initialize the ResourceModule with the database instance
+except Exception as e:
+    st.warning(f"Resource Module initialization failed: {e}")
+    resource_module = None
+
 # Render the appropriate page with error handling
 if st.session_state.current_page == 'Home':
     render_home()
@@ -288,7 +296,13 @@ elif st.session_state.current_page == 'Social Media':
         social_media_module.render()
     else:
         st.error("Social Media Module is not available. Please check the console for errors.")
+# elif st.session_state.current_page == 'Resources':
+#     st.markdown("<div class='main-header'>Resource Library</div>", unsafe_allow_html=True)
+#     st.markdown("This section will contain mental health resources raghav raghav raghav and educational materials.")
+#     st.info("Resource Library is under development.")
 elif st.session_state.current_page == 'Resources':
-    st.markdown("<div class='main-header'>Resource Library</div>", unsafe_allow_html=True)
-    st.markdown("This section will contain mental health resources and educational materials.")
-    st.info("Resource Library is under development.")
+    if resource_module:
+        resource_module.render()
+    else:
+        st.error("Resource Module is not available. Please check the console for errors.")
+
