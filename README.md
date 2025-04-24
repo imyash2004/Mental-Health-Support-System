@@ -171,5 +171,8 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## Acknowledgments
 
 - Mental health resources and assessment tools adapted from established mental health organizations
-- NLP models provided by Hugging Face Transformers
+- NLP models provided by Hugging Face Transformers<img width="1440" alt="Screenshot 2025-04-14 at 12 51 45 PM" src="https://github.com/user-attachments/assets/7c8660b4-2ef7-4c3f-88d3-a17a0ca5ea9b" />
+
 - Streamlit for the interactive web interface
+
+
